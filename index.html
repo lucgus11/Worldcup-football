@@ -170,32 +170,20 @@
         }
 
         async function fetchMatches() {
-            const token = localStorage.getItem('fb_api_token');
-            const container = document.getElementById('matchesContainer');
-            const errorContainer = document.getElementById('errorContainer');
-            
-            container.innerHTML = '<p class="loading">Chargement des matchs...</p>';
-            errorContainer.innerHTML = '';
+    const container = document.getElementById('matchesContainer');
+    container.innerHTML = '<p class="loading">Chargement des matchs...</p>';
 
-            try {
-                // Utilisation d'un proxy CORS si nécessaire sur Vercel, 
-                // mais football-data.org accepte généralement les requêtes du navigateur si le bon header est là.
-                const response = await fetch(`${BASE_URL}/competitions/${COMPETITION_CODE}/matches`, {
-                    headers: { 'X-Auth-Token': token }
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Erreur API: ${response.status} (Vérifie ton Token ou ton plan d'abonnement)`);
-                }
-
-                const data = await response.json();
-                displayMatches(data.matches);
-
-            } catch (error) {
-                errorContainer.innerHTML = `<div class="error-msg">${error.message}</div>`;
-                container.innerHTML = '<p class="loading">Impossible de charger les données.</p>';
-            }
-        }
+    try {
+        // On appelle la fonction Vercel que l'on va créer ci-dessous
+        const response = await fetch('/api/matches');
+        if (!response.ok) throw new Error('Erreur lors de la récupération des données');
+        
+        const data = await response.json();
+        displayMatches(data.matches);
+    } catch (error) {
+        container.innerHTML = `<p class="loading">Erreur : ${error.message}</p>`;
+    }
+}
 
         function displayMatches(matches) {
             const container = document.getElementById('matchesContainer');
